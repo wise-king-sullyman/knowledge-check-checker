@@ -1,27 +1,10 @@
 require 'pry'
 
+require_relative './SectionFinder'
+
 file = File.open('./test.md', 'r')
-
-file_array = file.readlines
-
-def find_knowledge_check_section(file_array)
-  knowledge_check_start_index, knowledge_check_end_index = nil
-
-  file_array.each.with_index do |line, index|
-    knowledge_check_start_index = index if line.include?('### Knowledge Check')
-
-    knowledge_check_end_index = index
-
-    if knowledge_check_start_index && (line.include?('### Additional Resources') || line.include?('### Conclusion'))
-      break
-    end
-  end
-  { start: knowledge_check_start_index, length: knowledge_check_end_index - knowledge_check_start_index }
-end
-
-foo = find_knowledge_check_section(file_array)
-
-knowledge_check_section = file_array.slice(foo[:start], foo[:length])
+lesson = SectionFinder.new(file.readlines)
+knowledge_check_section = lesson.find_section('Knowledge Check')
 
 external_link_lines = knowledge_check_section.select do |line|
   line.include?('http')
